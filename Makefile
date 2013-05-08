@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-I.
+CFLAGS=-lm -I.
 DEPS = imglib.h
 OBJ = imglib.o main.o 
 

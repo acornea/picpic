@@ -1,3 +1,4 @@
+#include <math.h>
 #include "imglib.h"
 
 image alloc_img (unsigned int width, unsigned int height)
@@ -172,7 +173,7 @@ void apply_filter( image img, short filter[], short imp, short depl )
 		for ( j=0; j <  img->width; j++ )
 			new->buf[i * img->width  + j] = img->buf[ i * img->width + j];
 */
-		
+
 	for ( i=0; i< img->height; i++)
 		for ( j=0; j < img->width; j++ )
 		{
@@ -190,11 +191,64 @@ void apply_filter( image img, short filter[], short imp, short depl )
 
 			pixel = (pixel / imp) + depl;
 
+			//check to stay in bounds
 			if( pixel < 0 ) pixel = 0;
-			if ( pixel > 255 ) pixel = 255;
+			if( pixel > 255 ) pixel = 255;
 
 			img->buf[ i*img->width + j ] = pixel ; 
 		}
 			
+}
 
+void get_image_edges(image img)
+{
+
+	unsigned int i, j; 
+	int pixelx, pixely, pixel ; 
+
+	image new = alloc_img(img->width, img->height);
+
+	if ( new == NULL)
+	{	
+		printf("Couldnt find edges. Memory insufficient\n");
+		return;
+	}
+
+	for ( i=0; i< img->height; i++)
+		memcpy(new->buf + i*img->width, img->buf + i * img->width, img->width);
+
+	for ( i=0; i< img->height; i++)
+		for ( j=0; j < img->width; j++ )
+		{
+			pixelx = 0 ;
+			pixely = 0 ;
+
+		   	pixelx += j<img->width-1 && i>0  ? new->buf[(i-1)* img->width + j + 1 ] : 0;
+        	pixelx += j<img->width-1 ? new->buf[i* img->width + j +1 ] * 2 : 0;
+        	pixelx += j<img->width-1 && i< img->height-1 ? new->buf[(i+1)* img->width + j +1 ] : 0 ;
+
+        	pixelx -= j>0 && i>0 ? new->buf[(i-1)* img->width + j - 1 ] : 0;
+        	pixelx -= j>0 ? new->buf[i* img->width + j - 1 ] * 2 : 0;
+        	pixelx -= j>0 && i<img->height-1 ? new->buf[(i+1)* img->width + j - 1 ] : 0;
+
+        	pixely += i>0 && j>0 ? new->buf[(i-1)* img->width + j - 1 ] : 0;
+        	pixely += i>0 ? new->buf[ (i-1)* img->width + j ] * 2 : 0;
+        	pixely += i>0 && j<img->width-1 ? new->buf[(i-1)* img->width + j + 1 ] : 0;
+
+        	pixely -= i< img->height-1  && j>0 ? new->buf[(i+1)* img->width + j - 1 ] : 0 ;
+        	pixely -= i< img->height-1 ? new->buf[(i+1)* img->width + j ] * 2 : 0 ;
+        	pixely -= i< img->height-1  && j< img->width-1 ? new->buf[(i+1)* img->width + j + 1 ] : 0 ;
+
+        	pixel = sqrt( pixelx*pixelx + pixely*pixely );
+
+        	//reverse not to get the negative
+        	pixel = 255 - pixel ;
+
+        	//check to stay in bounds
+        	if( pixel > 255 ) pixel = 255;
+        	if( pixel < 0 ) pixel = 0;
+
+        	img->buf[i * img->width + j] = pixel;
+
+		}
 }

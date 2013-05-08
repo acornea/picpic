@@ -8,6 +8,7 @@
 #define SHARPEN 4
 #define MEAN_REMOVAL 5
 #define EMBOSS 6
+#define EDGE 7
 
 
 
@@ -80,6 +81,8 @@ int read_params(int argc, char* argv[])
 		filter[6]=-1; filter[7]=0; filter[8]=-1;
 		imp = 1; depl=127;
 	}
+	else if (strcmp(argv[3], "edge") == 0 )
+		action = EDGE;
 	else 
 	{
 		printf("Unknown action.. exiting.\n");
@@ -120,12 +123,16 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
+	printf("Width: %d\nHeight: %d\n", img->width, img->height);
+
+	
 	switch(action)
 	{
 		case COPY:
 			break;
 
 		case CONTRAST:
+			printf("Applying contrast...\n");
 			apply_contrast(img, inf_limit, sup_limit);
 			break;
 		case SMOOTH:
@@ -136,8 +143,14 @@ int main(int argc, char* argv[])
 			printf("Applying filter...\n");
 			apply_filter(img, filter, imp, depl);
 			break;
+		case EDGE:
+			printf("Applying edge detection...\n");
+			get_image_edges(img);
+			break;
+
 
 	}
+	printf("Writing output image...\n");
 	write_ppm (fo, img);
 
 
