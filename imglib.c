@@ -169,10 +169,6 @@ void apply_filter( image img, short filter[], short imp, short depl )
 
 	for ( i=0; i< img->height; i++)
 		memcpy(new->buf + i*img->width, img->buf + i * img->width, img->width);
-	/*
-		for ( j=0; j <  img->width; j++ )
-			new->buf[i * img->width  + j] = img->buf[ i * img->width + j];
-*/
 
 	for ( i=0; i< img->height; i++)
 		for ( j=0; j < img->width; j++ )
